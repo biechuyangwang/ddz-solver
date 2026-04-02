@@ -28,11 +28,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Solver completes two-player endgame search within 10 seconds for positions up to 10 cards per hand
   4. Decision tree captures all winning paths, and every path through the tree leads to a terminal winning state when followed
   5. Pass (过) is correctly handled as a valid move, and the solver correctly alternates play control after consecutive passes
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Project scaffold, types, encoding, combinations utility, hand type detection/classification (SOLV-01, SOLV-02)
+- [ ] 01-02-PLAN.md -- Move generation for leading and following modes, all 14 hand types (SOLV-02, SOLV-03, SOLV-06)
+- [ ] 01-03-PLAN.md -- Transposition table, negamax search, decision tree, solver API, integration tests (SOLV-04, SOLV-05, SOLV-06, SOLV-07, SOLV-08)
 
 ### Phase 2: Interactive App + Worker
 **Goal**: Users can input both players' hands through a visual card picker, trigger the solver, and see the win/lose result with search statistics -- all in a Chinese-language web interface
@@ -75,6 +76,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Solver Engine | 0/? | Not started | - |
+| 1. Core Solver Engine | 0/3 | Planning complete | - |
 | 2. Interactive App + Worker | 0/? | Not started | - |
 | 3. Visualization + Simulation | 0/? | Not started | - |
