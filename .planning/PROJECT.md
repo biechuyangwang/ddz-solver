@@ -14,14 +14,14 @@
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] 支持所有标准斗地主牌型：单牌、对子、三带一/二、顺子、连对、飞机带翅膀、四带二、炸弹、火箭 — Validated in Phase 1: Core Solver Engine
 
 ### Active
 
 - [ ] 支持输入双方手牌（1-13 代表 A-K，14 代表小王，15 代表大王）
 - [ ] 支持所有标准斗地主牌型：单牌、对子、三带一/二、顺子、连对、飞机带翅膀、四带二、炸弹、火箭
 - [ ] 默认用户先手，可选择后手
-- [ ] 使用博弈树 Minimax + Alpha-Beta 剪枝搜索必胜路径
+- [x] 使用博弈树 Minimax + Alpha-Beta 剪枝搜索必胜路径 — Validated in Phase 1: Core Solver Engine
 - [ ] Web Worker 后台计算，不阻塞 UI
 - [ ] 交互式树形图展示完整决策树（可展开/折叠，点击节点查看详情）
 - [ ] 逐步对局模拟（一步步展示最优出牌和对局过程）
@@ -54,7 +54,7 @@
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | 纯前端 + Web Worker | 无需后端部署，用户体验更直接 | — Pending |
-| 支持全部标准牌型 | 完整的斗地主残局体验 | — Pending |
+| 支持全部标准牌型 | 完整的斗地主残局体验 | — Validated Phase 1: all 14 types classified correctly |
 | 树形图 + 步骤引导双模式 | 树形图适合分析全局策略，步骤引导适合模拟实战 | — Pending |
 
 ## Evolution
@@ -75,4 +75,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after initialization*
+*Last updated: 2026-04-03 after Phase 1 completion*
