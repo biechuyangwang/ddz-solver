@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Project scaffold, types, encoding, combinations utility, hand type detection/classification (SOLV-01, SOLV-02)
+- [x] 01-01-PLAN.md -- Project scaffold, types, encoding, combinations utility, hand type detection/classification (SOLV-01, SOLV-02)
 - [ ] 01-02-PLAN.md -- Move generation for leading and following modes, all 14 hand types (SOLV-02, SOLV-03, SOLV-06)
 - [ ] 01-03-PLAN.md -- Transposition table, negamax search, decision tree, solver API, integration tests (SOLV-04, SOLV-05, SOLV-06, SOLV-07, SOLV-08)
 
@@ -76,6 +76,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Solver Engine | 0/3 | Planning complete | - |
+| 1. Core Solver Engine | 1/3 | In Progress|  |
 | 2. Interactive App + Worker | 0/? | Not started | - |
 | 3. Visualization + Simulation | 0/? | Not started | - |
