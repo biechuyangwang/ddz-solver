@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-04-02T19:58:00.703Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-04-02T20:14:34.481Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01 P01 | 13m | 2 tasks | 10 files |
 | Phase 01 P02 | 10min | 2 tasks | 2 files |
+| Phase 01 P03 | 13m | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,11 @@ Recent decisions affecting current work:
 - [Phase 01]: classifyMove uses greedy detection order: rocket > bomb > complex > simple types
 - [Phase 01]: All valid sub-sequences generated for straights/consecutive pairs/airplanes (not just maximal runs)
 - [Phase ?]: Following mode adds bomb/rocket overrides only for non-bomb, non-rocket last moves
+- [Phase 01]: String-based hashing for transposition table (sufficient for endgame <10 cards per hand)
+- [Phase 01]: Move ordering: bombs/rockets first, then mainRank descending for early alpha-beta cutoffs
+- [Phase 01]: Time budget check every 10000 nodes to reduce performance overhead
+- [Phase 01]: TreeBuilder stack-based push/pop for tree construction during recursion
+- [Phase 01]: solve() swaps perspective for firstPlayerIsUser=false via negated negamax result
 
 ### Pending Todos
 
@@ -79,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T19:58:00.700Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-04-02T20:14:34.478Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None

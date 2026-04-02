@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-PLAN.md -- Project scaffold, types, encoding, combinations utility, hand type detection/classification (SOLV-01, SOLV-02)
 - [x] 01-02-PLAN.md -- Move generation for leading and following modes, all 14 hand types (SOLV-02, SOLV-03, SOLV-06)
-- [ ] 01-03-PLAN.md -- Transposition table, negamax search, decision tree, solver API, integration tests (SOLV-04, SOLV-05, SOLV-06, SOLV-07, SOLV-08)
+- [x] 01-03-PLAN.md -- Transposition table, negamax search, decision tree, solver API, integration tests (SOLV-04, SOLV-05, SOLV-06, SOLV-07, SOLV-08)
 
 ### Phase 2: Interactive App + Worker
 **Goal**: Users can input both players' hands through a visual card picker, trigger the solver, and see the win/lose result with search statistics -- all in a Chinese-language web interface
