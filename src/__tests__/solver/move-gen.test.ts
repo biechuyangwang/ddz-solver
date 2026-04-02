@@ -3,7 +3,7 @@ import { createHand } from '../../solver/encoding.js';
 import { HandType } from '../../solver/types.js';
 import { PASS_MOVE } from '../../solver/types.js';
 import type { Move } from '../../solver/types.js';
-import { generateLeadingMoves } from '../../solver/move-gen.js';
+import { generateLeadingMoves, generateFollowingMoves } from '../../solver/move-gen.js';
 
 // Helper: find moves by type
 function findMovesByType(moves: Move[], type: HandType): Move[] {
@@ -248,5 +248,228 @@ describe('generateLeadingMoves', () => {
     const hand = createHand([]);
     const moves = generateLeadingMoves(hand);
     expect(moves).toHaveLength(0);
+  });
+});
+
+describe('generateFollowingMoves', () => {
+  // Helper to create a lastMove object
+  function makeLastMove(type: HandType, mainRank: number, length: number, cards: number[]): Move {
+    return { type, mainRank, length, cards };
+  }
+
+  it('Following a SINGLE(5): generates all SINGLEs with mainRank > 4 + PASS', () => {
+    const hand = createHand([3, 7, 9]);
+    const lastMove = makeLastMove(HandType.SINGLE, 4, 1, [5]); // value 5 = index 4
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    // PASS is always present
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    // Only SINGLEs with higher rank
+    const singles = findMovesByType(moves, HandType.SINGLE);
+    expect(singles).toHaveLength(2); // 7 (index 6) and 9 (index 8)
+    expect(hasMove(moves, HandType.SINGLE, 6)).toBe(true);
+    expect(hasMove(moves, HandType.SINGLE, 8)).toBe(true);
+
+    // No pairs, triples, etc.
+    expect(findMovesByType(moves, HandType.PAIR)).toHaveLength(0);
+    expect(findMovesByType(moves, HandType.TRIPLE)).toHaveLength(0);
+  });
+
+  it('Following a PAIR(5): generates all PAIRs with mainRank > 4 + PASS', () => {
+    const hand = createHand([3, 3, 7, 7, 9, 9]);
+    const lastMove = makeLastMove(HandType.PAIR, 4, 2, [5, 5]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const pairs = findMovesByType(moves, HandType.PAIR);
+    expect(pairs).toHaveLength(2); // pair of 7s and pair of 9s
+    expect(hasMove(moves, HandType.PAIR, 6)).toBe(true);
+    expect(hasMove(moves, HandType.PAIR, 8)).toBe(true);
+
+    // No singles
+    expect(findMovesByType(moves, HandType.SINGLE)).toHaveLength(0);
+  });
+
+  it('Following a TRIPLE(5): generates all TRIPLEs with mainRank > 4 + PASS', () => {
+    const hand = createHand([7, 7, 7, 9, 9, 9]);
+    const lastMove = makeLastMove(HandType.TRIPLE, 4, 3, [5, 5, 5]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const triples = findMovesByType(moves, HandType.TRIPLE);
+    expect(triples).toHaveLength(2);
+    expect(hasMove(moves, HandType.TRIPLE, 6)).toBe(true);
+    expect(hasMove(moves, HandType.TRIPLE, 8)).toBe(true);
+  });
+
+  it('Following a TRIPLE_SINGLE(mainRank=4): generates higher TRIPLE_SINGLEs + PASS', () => {
+    const hand = createHand([7, 7, 7, 3, 9, 9, 9, 5]);
+    const lastMove = makeLastMove(HandType.TRIPLE_SINGLE, 4, 4, [5, 5, 5, 3]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const ts = findMovesByType(moves, HandType.TRIPLE_SINGLE);
+    // Should have TRIPLE_SINGLE for rank 7 (index 6) with various kickers,
+    // and rank 9 (index 8) with various kickers
+    expect(ts.length).toBeGreaterThan(0);
+    // All mainRanks should be > 4
+    for (const m of ts) {
+      expect(m.mainRank).toBeGreaterThan(4);
+    }
+  });
+
+  it('Following a STRAIGHT(mainRank=2, length=5, cards 3-7): generates same-length higher STRAIGHTs + PASS + bomb overrides', () => {
+    const hand = createHand([4, 5, 6, 7, 8, 9, 10]);
+    const lastMove = makeLastMove(HandType.STRAIGHT, 2, 5, [3, 4, 5, 6, 7]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const straights = findMovesByType(moves, HandType.STRAIGHT);
+    // Should have straights of length 5 with mainRank > 2
+    for (const s of straights) {
+      expect(s.length).toBe(5);
+      expect(s.mainRank).toBeGreaterThan(2);
+    }
+  });
+
+  it('Following a STRAIGHT(mainRank=2, length=5): does NOT generate straights of length 6', () => {
+    const hand = createHand([4, 5, 6, 7, 8, 9, 10, 11]);
+    const lastMove = makeLastMove(HandType.STRAIGHT, 2, 5, [3, 4, 5, 6, 7]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    const straights = findMovesByType(moves, HandType.STRAIGHT);
+    for (const s of straights) {
+      expect(s.length).toBe(5); // strictly same length
+    }
+  });
+
+  it('Following a CONSECUTIVE_PAIRS(mainRank=2, length=3): generates same-length higher + PASS', () => {
+    const hand = createHand([5, 5, 6, 6, 7, 7, 8, 8]);
+    const lastMove = makeLastMove(HandType.CONSECUTIVE_PAIRS, 2, 3, [3, 3, 4, 4, 5, 5]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const cps = findMovesByType(moves, HandType.CONSECUTIVE_PAIRS);
+    for (const cp of cps) {
+      expect(cp.length).toBe(3);
+      expect(cp.mainRank).toBeGreaterThan(2);
+    }
+  });
+
+  it('Following an AIRPLANE(mainRank=4, length=2): generates same-length higher AIRPLANEs + PASS', () => {
+    const hand = createHand([7, 7, 7, 8, 8, 8, 9, 9, 9]);
+    const lastMove = makeLastMove(HandType.AIRPLANE, 4, 2, [5, 5, 5, 6, 6, 6]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const airplanes = findMovesByType(moves, HandType.AIRPLANE);
+    for (const a of airplanes) {
+      expect(a.length).toBe(2);
+      expect(a.mainRank).toBeGreaterThan(4);
+    }
+  });
+
+  it('Following an AIRPLANE_SINGLES(mainRank=4, length=2): generates higher + PASS', () => {
+    const hand = createHand([7, 7, 7, 8, 8, 8, 3, 9]);
+    const lastMove = makeLastMove(HandType.AIRPLANE_SINGLES, 4, 2, [5, 5, 5, 6, 6, 6, 3, 4]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const airSingles = findMovesByType(moves, HandType.AIRPLANE_SINGLES);
+    for (const a of airSingles) {
+      expect(a.length).toBe(2);
+      expect(a.mainRank).toBeGreaterThan(4);
+    }
+  });
+
+  it('Following a BOMB(mainRank=7): generates higher BOMBs + ROCKET + PASS', () => {
+    const hand = createHand([9, 9, 9, 9, 14, 15]); // bomb of 9s + both jokers
+    const lastMove = makeLastMove(HandType.BOMB, 7, 4, [8, 8, 8, 8]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const bombs = findMovesByType(moves, HandType.BOMB);
+    expect(bombs).toHaveLength(1);
+    expect(bombs[0].mainRank).toBe(8); // bomb of 9s = index 8
+
+    expect(hasMove(moves, HandType.ROCKET, 14)).toBe(true);
+
+    // No non-bomb responses when following a bomb
+    expect(findMovesByType(moves, HandType.SINGLE)).toHaveLength(0);
+    expect(findMovesByType(moves, HandType.PAIR)).toHaveLength(0);
+  });
+
+  it('Following a ROCKET: generates only PASS', () => {
+    const hand = createHand([3, 5, 7, 9]);
+    const lastMove = makeLastMove(HandType.ROCKET, 14, 2, [14, 15]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves).toHaveLength(1);
+    expect(moves[0].type).toBe(HandType.PASS);
+  });
+
+  it('Following any non-bomb move: BOMBs and ROCKET are available as overrides', () => {
+    const hand = createHand([3, 5, 7, 7, 7, 7, 14, 15]); // bomb of 7s + rocket
+    const lastMove = makeLastMove(HandType.SINGLE, 4, 1, [5]); // single 5
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(hasMove(moves, HandType.BOMB, 6)).toBe(true); // bomb of 7s
+    expect(hasMove(moves, HandType.ROCKET, 14)).toBe(true);
+  });
+
+  it('PASS is always in the result for any following mode call', () => {
+    const hand = createHand([3, 5]);
+    const lastMove = makeLastMove(HandType.SINGLE, 12, 1, [13]); // single K
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+  });
+
+  it('When lastMove is BOMB and opponent has only higher bombs, those are generated', () => {
+    const hand = createHand([11, 11, 11, 11]); // bomb of Js
+    const lastMove = makeLastMove(HandType.BOMB, 7, 4, [8, 8, 8, 8]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    const bombs = findMovesByType(moves, HandType.BOMB);
+    expect(bombs).toHaveLength(1);
+    expect(bombs[0].mainRank).toBe(10); // J = index 10
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+  });
+
+  it('Following a FOUR_TWO_SINGLES: generates higher FOUR_TWO_SINGLES + PASS + bomb overrides', () => {
+    const hand = createHand([9, 9, 9, 9, 3, 5]); // four 9s + 2 kickers
+    const lastMove = makeLastMove(HandType.FOUR_TWO_SINGLES, 7, 6, [8, 8, 8, 8, 3, 5]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const f2s = findMovesByType(moves, HandType.FOUR_TWO_SINGLES);
+    expect(f2s.length).toBeGreaterThanOrEqual(1);
+    for (const m of f2s) {
+      expect(m.mainRank).toBeGreaterThan(7);
+    }
+  });
+
+  it('Following a FOUR_TWO_PAIRS: generates higher FOUR_TWO_PAIRS + PASS + bomb overrides', () => {
+    const hand = createHand([9, 9, 9, 9, 3, 3, 5, 5]);
+    const lastMove = makeLastMove(HandType.FOUR_TWO_PAIRS, 7, 8, [8, 8, 8, 8, 3, 3, 5, 5]);
+    const moves = generateFollowingMoves(hand, lastMove);
+
+    expect(moves.some(m => m.type === HandType.PASS)).toBe(true);
+
+    const f2p = findMovesByType(moves, HandType.FOUR_TWO_PAIRS);
+    expect(f2p.length).toBeGreaterThanOrEqual(1);
+    for (const m of f2p) {
+      expect(m.mainRank).toBeGreaterThan(7);
+    }
   });
 });
