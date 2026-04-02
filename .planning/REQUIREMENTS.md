@@ -17,10 +17,10 @@
 
 - [x] **SOLV-01**: Bitmask game state representation (17-bit counters per hand for values 1-15)
 - [x] **SOLV-02**: Recognize all 14 standard DDZ hand types: single, pair, triple, triple+1, triple+2, straight (5+), consecutive pairs (3+), airplane, airplane+singles, airplane+pairs, four+2singles, four+2pairs, bomb, rocket
-- [ ] **SOLV-03**: Move generator enumerates all legal plays for leading and following modes
+- [x] **SOLV-03**: Move generator enumerates all legal plays for leading and following modes
 - [ ] **SOLV-04**: Minimax search with alpha-beta pruning computes optimal play
 - [ ] **SOLV-05**: Transposition table with Zobrist hashing for state deduplication
-- [ ] **SOLV-06**: Pass (过) handled as valid move in game tree
+- [x] **SOLV-06**: Pass (过) handled as valid move in game tree
 - [ ] **SOLV-07**: Time budget enforcement (default 10s, returns best partial result)
 - [ ] **SOLV-08**: Decision tree built during search captures all winning paths
 
@@ -87,10 +87,10 @@
 | CARD-05 | Phase 2 | Pending |
 | SOLV-01 | Phase 1 | Complete |
 | SOLV-02 | Phase 1 | Complete |
-| SOLV-03 | Phase 1 | Pending |
+| SOLV-03 | Phase 1 | Complete |
 | SOLV-04 | Phase 1 | Pending |
 | SOLV-05 | Phase 1 | Pending |
-| SOLV-06 | Phase 1 | Pending |
+| SOLV-06 | Phase 1 | Complete |
 | SOLV-07 | Phase 1 | Pending |
 | SOLV-08 | Phase 1 | Pending |
 | WORK-01 | Phase 2 | Pending |

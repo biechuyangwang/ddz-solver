@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-04-02T19:42:55.021Z"
+status: verifying
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-04-02T19:58:00.703Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 01 (core-solver-engine) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
+Plan: 3 of 3
+Status: Phase complete — ready for verification
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 13m | 2 tasks | 10 files |
+| Phase 01 P02 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Count-based hand encoding (array of 15 counters) chosen over bitmask for clarity
 - [Phase 01]: sequentialIndices helper skips index 1 (value 2) for sequential type detection
 - [Phase 01]: classifyMove uses greedy detection order: rocket > bomb > complex > simple types
+- [Phase 01]: All valid sub-sequences generated for straights/consecutive pairs/airplanes (not just maximal runs)
+- [Phase ?]: Following mode adds bomb/rocket overrides only for non-bomb, non-rocket last moves
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T19:42:55.019Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-04-02T19:58:00.700Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
