@@ -1,6 +1,7 @@
 import { useGameStore } from '../store/game-store';
 import { ResultHeader } from './ResultHeader';
 import { ResultTabs, type TabId } from './ResultTabs';
+import { SimulationView } from './simulation/SimulationView';
 
 export function ResultPanel() {
   const status = useGameStore((s) => s.status);
@@ -45,13 +46,12 @@ export function ResultPanel() {
           </div>
         )}
         {activeTab === 'simulation' && !tabsDisabled && (
-          <div className="text-center py-12 text-gray-400">
-            <p className="text-lg mb-2">模拟视图加载中...</p>
-          </div>
+          <SimulationView />
         )}
         {activeTab === 'simulation' && tabsDisabled && (
           <div className="text-center py-12 text-gray-400">
-            <p className="text-lg mb-2">请先输入手牌并点击"求解"，模拟仅支持必胜局面</p>
+            <p className="text-lg mb-2">无必胜策略，无法模拟</p>
+            <p className="text-sm">模拟仅支持必胜局面</p>
           </div>
         )}
       </div>
