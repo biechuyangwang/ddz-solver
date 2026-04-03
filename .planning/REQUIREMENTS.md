@@ -7,11 +7,11 @@
 
 ### Card Input
 
-- [ ] **CARD-01**: User can input both players' hands using visual card picker (click-to-select from full deck)
-- [ ] **CARD-02**: Cards displayed with suit symbols and face values (visual poker cards, not text codes)
-- [ ] **CARD-03**: User can select first/second player (default: user goes first)
-- [ ] **CARD-04**: User can clear/reset input with undo support
-- [ ] **CARD-05**: Input validation prevents illegal states (max 4 of each value, total cards match)
+- [x] **CARD-01**: User can input both players' hands using visual card picker (click-to-select from full deck)
+- [x] **CARD-02**: Cards displayed with suit symbols and face values (visual poker cards, not text codes)
+- [x] **CARD-03**: User can select first/second player (default: user goes first)
+- [x] **CARD-04**: User can clear/reset input with undo support
+- [x] **CARD-05**: Input validation prevents illegal states (max 4 of each value, total cards match)
 
 ### Solver Engine
 
@@ -80,11 +80,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CARD-01 | Phase 2 | Pending |
-| CARD-02 | Phase 2 | Pending |
-| CARD-03 | Phase 2 | Pending |
-| CARD-04 | Phase 2 | Pending |
-| CARD-05 | Phase 2 | Pending |
+| CARD-01 | Phase 2 | Complete |
+| CARD-02 | Phase 2 | Complete |
+| CARD-03 | Phase 2 | Complete |
+| CARD-04 | Phase 2 | Complete |
+| CARD-05 | Phase 2 | Complete |
 | SOLV-01 | Phase 1 | Complete |
 | SOLV-02 | Phase 1 | Complete |
 | SOLV-03 | Phase 1 | Complete |
