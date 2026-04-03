@@ -1,6 +1,7 @@
 import { useGameStore } from '../store/game-store';
 import { ResultHeader } from './ResultHeader';
 import { ResultTabs, type TabId } from './ResultTabs';
+import { DecisionTreeView } from './tree/DecisionTreeView';
 
 export function ResultPanel() {
   const status = useGameStore((s) => s.status);
@@ -31,13 +32,9 @@ export function ResultPanel() {
       <ResultTabs activeTab={activeTab} onTabChange={setActiveTab} tabsDisabled={tabsDisabled} />
 
       <div className="mt-4">
-        {activeTab === 'overview' && (
-          <div /> /* Overview content is already shown in ResultHeader above tabs */
-        )}
+        {activeTab === 'overview' && null}
         {activeTab === 'tree' && !tabsDisabled && (
-          <div className="text-center py-12 text-gray-400">
-            <p className="text-lg mb-2">决策树视图加载中...</p>
-          </div>
+          <DecisionTreeView />
         )}
         {activeTab === 'tree' && tabsDisabled && (
           <div className="text-center py-12 text-gray-400">
