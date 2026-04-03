@@ -20,6 +20,15 @@ interface GameState {
   // Elapsed time tracking (for progress display)
   solveStartTime: number | null;
 
+  // Visualization state (Phase 3)
+  activeTab: 'overview' | 'tree' | 'simulation';
+  selectedNodeId: string | null;
+
+  // Simulation state
+  currentStepIndex: number;
+  autoPlaying: boolean;
+  autoPlaySpeed: number; // ms between steps: 3000=0.5x, 1500=1x, 750=2x
+
   // Actions
   addCard: (target: PlayerTarget, cardValue: number) => void;
   removeCard: (target: PlayerTarget, cardValue: number) => void;
@@ -30,6 +39,16 @@ interface GameState {
   setResult: (result: SolverResult) => void;
   setError: (message: string) => void;
   cancelSolving: () => void;
+
+  // Visualization actions
+  setActiveTab: (tab: 'overview' | 'tree' | 'simulation') => void;
+  selectNode: (nodeId: string | null) => void;
+  setStepIndex: (index: number) => void;
+  nextStep: (maxSteps: number) => void;
+  prevStep: () => void;
+  startAutoPlay: () => void;
+  stopAutoPlay: () => void;
+  setAutoPlaySpeed: (speed: number) => void;
 }
 
 // Worker reference for cancellation
@@ -43,6 +62,11 @@ export const useGameStore = create<GameState>((set, get) => ({
   result: null,
   errorMessage: null,
   solveStartTime: null,
+  activeTab: 'overview',
+  selectedNodeId: null,
+  currentStepIndex: 0,
+  autoPlaying: false,
+  autoPlaySpeed: 1500,
 
   addCard: (target, cardValue) =>
     set((state) => ({
@@ -83,6 +107,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       result: null,
       errorMessage: null,
       solveStartTime: null,
+      activeTab: 'overview',
+      selectedNodeId: null,
+      currentStepIndex: 0,
+      autoPlaying: false,
+      autoPlaySpeed: 1500,
     });
   },
 
@@ -132,4 +161,13 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
     set({ status: 'idle', solveStartTime: null });
   },
+
+  setActiveTab: (tab) => set({ activeTab: tab, selectedNodeId: null }),
+  selectNode: (nodeId) => set({ selectedNodeId: nodeId }),
+  setStepIndex: (index) => set({ currentStepIndex: index }),
+  nextStep: (maxSteps) => set((s) => ({ currentStepIndex: Math.min(s.currentStepIndex + 1, maxSteps - 1) })),
+  prevStep: () => set((s) => ({ currentStepIndex: Math.max(s.currentStepIndex - 1, 0) })),
+  startAutoPlay: () => set({ autoPlaying: true }),
+  stopAutoPlay: () => set({ autoPlaying: false }),
+  setAutoPlaySpeed: (speed) => set({ autoPlaySpeed: speed }),
 }));
