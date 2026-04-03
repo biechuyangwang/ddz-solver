@@ -39,3 +39,32 @@ export function cardAriaLabel(value: number, suit?: Suit): string {
   };
   return `${suitNames[suit!]}${VALUE_DISPLAY[value]}`;
 }
+
+import { HandType } from '../solver/types';
+import type { Move } from '../solver/types';
+
+/** Format a move into a human-readable Chinese label */
+export function formatMoveLabel(move: Move): string {
+  if (move.type === HandType.PASS) return '过';
+  if (move.type === HandType.ROCKET) return '火箭';
+  if (move.type === HandType.BOMB) return `炸弹 ${VALUE_DISPLAY[move.mainRank + 1] ?? move.mainRank + 1}`;
+
+  const rank = (r: number) => VALUE_DISPLAY[r + 1] ?? String(r + 1);
+  const cards = move.cards.map(v => VALUE_DISPLAY[v] ?? String(v));
+
+  switch (move.type) {
+    case HandType.SINGLE: return `单 ${rank(move.mainRank)}`;
+    case HandType.PAIR: return `对 ${rank(move.mainRank)}`;
+    case HandType.TRIPLE: return `三条 ${rank(move.mainRank)}`;
+    case HandType.TRIPLE_SINGLE: return `三带一 ${rank(move.mainRank)}`;
+    case HandType.TRIPLE_PAIR: return `三带二 ${rank(move.mainRank)}`;
+    case HandType.STRAIGHT: return `顺子 ${cards.join('')}`;
+    case HandType.CONSECUTIVE_PAIRS: return `连对 ${cards.join('')}`;
+    case HandType.AIRPLANE: return `飞机 ${cards.join('')}`;
+    case HandType.AIRPLANE_SINGLES: return `飞机带单 ${cards.join('')}`;
+    case HandType.AIRPLANE_PAIRS: return `飞机带对 ${cards.join('')}`;
+    case HandType.FOUR_TWO_SINGLES: return `四带二 ${cards.join('')}`;
+    case HandType.FOUR_TWO_PAIRS: return `四带两对 ${cards.join('')}`;
+    default: return cards.join(' ');
+  }
+}

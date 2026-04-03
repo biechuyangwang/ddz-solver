@@ -7,4 +7,21 @@
   --color-suit-red: #dc2626;
   --color-suit-black: #1f2937;
   --color-page-bg: #f9fafb;
+
+  /* Tree visualization */
+  --color-node-win: #16a34a;
+  --color-node-win-bg: #f0fdf4;
+  --color-node-loss: #dc2626;
+  --color-node-loss-bg: #fef2f2;
+  --color-node-unknown: #6b7280;
+  --color-node-unknown-bg: #f9fafb;
+
+  /* Simulation */
+  --color-step-player: #2563eb;
+  --color-step-opponent: #9333ea;
+  --color-accent-green: #16a34a;
+
+  /* Tab system */
+  --color-tab-active: #2563eb;
+  --color-tab-border: #e5e7eb;
 }
