@@ -51,7 +51,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md -- Vite+React+Tailwind scaffold, Web Worker wrapper, zustand store, card utilities (WORK-01, WORK-03, RSLT-04)
 - [ ] 02-02-PLAN.md -- Card input UI: CardFace, CardPicker, HandDisplay, PlayerPanel, PlayerToggle, validation (CARD-01, CARD-02, CARD-03, CARD-04, CARD-05)
-- [ ] 02-03-PLAN.md -- Solve flow, progress/cancel, ResultPanel with win/lose badge and statistics (WORK-01, WORK-02, WORK-03, RSLT-01, RSLT-02, RSLT-04)
+- [x] 02-03-PLAN.md -- Solve flow, progress/cancel, ResultPanel with win/lose badge and statistics (WORK-01, WORK-02, WORK-03, RSLT-01, RSLT-02, RSLT-04)
 
 ### Phase 3: Visualization + Simulation
 **Goal**: Users can explore the complete winning decision tree interactively and walk through the optimal play sequence step by step, switching between both views
