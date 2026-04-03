@@ -45,12 +45,13 @@ Plans:
   3. Clicking "solve" runs the solver in a Web Worker without freezing the UI, shows a progress indicator during computation, and allows cancellation
   4. After solving, the user sees a clear win/lose result with a "必胜" badge for guaranteed wins, plus search statistics (nodes explored, time, transposition hits)
   5. The entire UI is in Chinese language, with English acceptable only for technical terms in statistics
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Vite+React+Tailwind scaffold, Web Worker wrapper, zustand store, card utilities (WORK-01, WORK-03, RSLT-04)
+- [ ] 02-02-PLAN.md -- Card input UI: CardFace, CardPicker, HandDisplay, PlayerPanel, PlayerToggle, validation (CARD-01, CARD-02, CARD-03, CARD-04, CARD-05)
+- [ ] 02-03-PLAN.md -- Solve flow, progress/cancel, ResultPanel with win/lose badge and statistics (WORK-01, WORK-02, WORK-03, RSLT-01, RSLT-02, RSLT-04)
 
 ### Phase 3: Visualization + Simulation
 **Goal**: Users can explore the complete winning decision tree interactively and walk through the optimal play sequence step by step, switching between both views
@@ -76,6 +77,6 @@ Phases execute in numeric order: 1 → 2 → 3
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Solver Engine | 1/3 | In Progress|  |
-| 2. Interactive App + Worker | 0/? | Not started | - |
+| 1. Core Solver Engine | 3/3 | Complete | 2026-04-03 |
+| 2. Interactive App + Worker | 0/3 | Not started | - |
 | 3. Visualization + Simulation | 0/? | Not started | - |
