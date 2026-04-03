@@ -50,21 +50,21 @@ Exceptions: none
 
 ## Typography
 
+Declared weights: 2 -- 400 (regular), 600 (semibold).
+
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm leading-relaxed` |
 | Label | 12px | 600 (semibold) | 1.33 | `text-xs font-semibold` |
 | Heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
-| Display | 28px | 700 (bold) | 1.2 | `text-3xl font-bold` |
+| Display | 28px | 600 (semibold) | 1.2 | `text-3xl font-semibold` |
 
 **Usage rules:**
-- Body: All descriptive text, statistics values, card count labels
-- Label: Section headers ("我方手牌", "对方手牌"), button text, statistics field names
-- Heading: Panel titles, result header ("求解结果")
-- Display: App title ("斗地主残局求解器"), win/lose badge text ("必胜")
+- Body (400): All descriptive text, statistics values, card count labels, card suit symbols
+- Semibold (600): Section headers ("我方手牌", "对方手牌"), button text, statistics field names, panel titles, result header ("求解结果"), app title ("斗地主残局求解器"), win/lose badge text ("必胜"), card face values, joker text
 
-**Card face typography:**
-- Card value: 16px, weight 700, on the card face -- `text-base font-bold`
+**Card face typography (component-scoped exception -- 16px is not part of the 4-size page scale; it is reserved for playing card face rendering only):**
+- Card value: 16px, weight 600 -- `text-base font-semibold`
 - Card suit symbol: 14px, weight 400 -- `text-sm`
 - Joker text ("小王", "大王"): 12px, weight 600 -- `text-xs font-semibold`
 
@@ -76,11 +76,11 @@ Exceptions: none
 |------|-------|-------|
 | Dominant (60%) | `#f9fafb` (gray-50) | Page background |
 | Secondary (30%) | `#ffffff` (white) | Card faces, panels, buttons, input areas |
-| Accent (10%) | `#2563eb` (blue-600) | Solve button, selected card border, "必胜" badge, active player toggle |
+| Accent (10%) | `#2563eb` (blue-600) | Solve button, selected card border, active player tab indicator |
 | Destructive | `#dc2626` (red-600) | Error messages, "无必胜策略" indicator |
 | Success | `#16a34a` (green-600) | "必胜" badge background, win-state highlights |
 
-Accent reserved for: Solve button (开始求解), selected card border glow, active player tab indicator, primary interactive elements.
+Accent reserved for: Solve button (开始求解), selected card border glow, active player tab indicator.
 
 **Card suit colors:**
 - Black suits (spade, club): `#1f2937` (gray-800)
@@ -119,7 +119,7 @@ All UI text is in Chinese. English is acceptable only for technical terms in the
 |---------|------|
 | Primary CTA (idle) | 开始求解 |
 | Primary CTA (solving) | 求解中... |
-| Cancel button | 取消 |
+| Cancel button | 取消求解 |
 | Clear button | 清空 |
 | Reset button | 重置 |
 | App title | 斗地主残局求解器 |
@@ -178,7 +178,7 @@ Phase 2 requires these custom components. No registry or third-party component l
 |  Card Picker Grid (4 suits x 13 values)   |
 |  + Jokers row (小王, 大王)                 |
 +------------------------------------------+
-|  [开始求解]  or  [求解中... spinner] [取消] |
+|  [开始求解]  or  [求解中... spinner] [取消求解] |
 +------------------------------------------+
 |  ResultPanel (shown after solve)          |
 |  必胜 / 无必胜策略  +  Stats + Best Move   |
