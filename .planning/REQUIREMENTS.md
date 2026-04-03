@@ -34,12 +34,12 @@
 
 - [ ] **TREE-01**: Interactive tree diagram shows complete winning decision tree
 - [ ] **TREE-02**: Nodes expandable/collapsible, color-coded (win/lose branches)
-- [ ] **TREE-03**: Clicking a tree node shows card details for that state
+- [x] **TREE-03**: Clicking a tree node shows card details for that state
 - [ ] **TREE-04**: Virtualized rendering handles large trees (>500 nodes)
 
 ### Step-by-Step Simulation
 
-- [ ] **SIM-01**: Step-by-step mode walks through optimal play sequence move by move
+- [x] **SIM-01**: Step-by-step mode walks through optimal play sequence move by move
 - [ ] **SIM-02**: Each step shows: current player, cards played, remaining hands
 - [ ] **SIM-03**: Opponent's possible responses displayed with winning counter-moves highlighted
 - [ ] **SIM-04**: Navigation controls: next/prev step, auto-play, jump to specific step
@@ -48,7 +48,7 @@
 
 - [x] **RSLT-01**: Clear win/lose result with "必胜" (guaranteed win) badge
 - [x] **RSLT-02**: Search statistics displayed (nodes explored, time, transposition hits)
-- [ ] **RSLT-03**: Tab-based view switching between tree and simulation modes
+- [x] **RSLT-03**: Tab-based view switching between tree and simulation modes
 - [x] **RSLT-04**: Chinese language UI (primary), English acceptable for technical terms
 
 ## v2 Requirements
@@ -98,15 +98,15 @@
 | WORK-03 | Phase 2 | Complete |
 | TREE-01 | Phase 3 | Pending |
 | TREE-02 | Phase 3 | Pending |
-| TREE-03 | Phase 3 | Pending |
+| TREE-03 | Phase 3 | Complete |
 | TREE-04 | Phase 3 | Pending |
-| SIM-01 | Phase 3 | Pending |
+| SIM-01 | Phase 3 | Complete |
 | SIM-02 | Phase 3 | Pending |
 | SIM-03 | Phase 3 | Pending |
 | SIM-04 | Phase 3 | Pending |
 | RSLT-01 | Phase 2 | Complete |
 | RSLT-02 | Phase 2 | Complete |
-| RSLT-03 | Phase 3 | Pending |
+| RSLT-03 | Phase 3 | Complete |
 | RSLT-04 | Phase 2 | Complete |
 
 **Coverage:**

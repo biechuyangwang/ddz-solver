@@ -67,7 +67,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 03-01-PLAN.md -- Foundation: install dependencies, game state reconstruction, simulation path extraction, tab system, store extension (RSLT-03, TREE-03, SIM-01)
+- [x] 03-01-PLAN.md -- Foundation: install dependencies, game state reconstruction, simulation path extraction, tab system, store extension (RSLT-03, TREE-03, SIM-01)
 - [ ] 03-02-PLAN.md -- Decision tree visualization: React Flow canvas, custom nodes, dagre layout, expand/collapse, detail panel (TREE-01, TREE-02, TREE-03, TREE-04)
 - [ ] 03-03-PLAN.md -- Step-by-step simulation: step display, opponent responses, navigation controls, auto-play, framer-motion animations (SIM-01, SIM-02, SIM-03, SIM-04)
 
