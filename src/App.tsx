@@ -3,6 +3,8 @@ import { useGameStore, type PlayerTarget } from './store/game-store';
 import { PlayerPanel } from './components/PlayerPanel';
 import { PlayerToggle } from './components/PlayerToggle';
 import { CardPicker } from './components/CardPicker';
+import { SolveButton } from './components/SolveButton';
+import { ResultPanel } from './components/ResultPanel';
 import { cn } from './lib/cn';
 
 function App() {
@@ -14,8 +16,6 @@ function App() {
   const status = useGameStore((s) => s.status);
   const resetAll = useGameStore((s) => s.resetAll);
   const setFirstPlayer = useGameStore((s) => s.setFirstPlayer);
-  const startSolving = useGameStore((s) => s.startSolving);
-  const cancelSolving = useGameStore((s) => s.cancelSolving);
 
   const isSolving = status === 'solving';
   const canSolve =
@@ -88,40 +88,14 @@ function App() {
         </div>
 
         {/* Solve button */}
-        <div className="flex gap-3">
-          <button
-            type="button"
-            className={cn(
-              'w-full py-3 rounded-lg font-semibold text-white transition-colors',
-              canSolve
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 cursor-not-allowed',
-            )}
-            disabled={!canSolve}
-            onClick={startSolving}
-          >
-            开始求解
-          </button>
-
-          {/* Cancel button (shown during solving) */}
-          {isSolving && (
-            <button
-              type="button"
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap"
-              onClick={cancelSolving}
-            >
-              取消求解
-            </button>
-          )}
+        <div className="mb-4">
+          <SolveButton canSolve={canSolve} />
         </div>
 
-        {/* Solving progress indicator */}
-        {isSolving && (
-          <div className="mt-4 text-center text-sm text-gray-500 flex items-center justify-center gap-2">
-            <span className="inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            求解中...
-          </div>
-        )}
+        {/* Result panel */}
+        <div aria-live="polite" className="mt-4">
+          <ResultPanel />
+        </div>
       </div>
     </div>
   );

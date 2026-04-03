@@ -27,7 +27,7 @@
 ### Worker Integration
 
 - [x] **WORK-01**: Solver runs in Web Worker via Comlink (non-blocking UI)
-- [ ] **WORK-02**: Progress indicator shows solver status during computation
+- [x] **WORK-02**: Progress indicator shows solver status during computation
 - [x] **WORK-03**: User can cancel in-progress solve
 
 ### Decision Tree Visualization
@@ -46,8 +46,8 @@
 
 ### Result Display
 
-- [ ] **RSLT-01**: Clear win/lose result with "必胜" (guaranteed win) badge
-- [ ] **RSLT-02**: Search statistics displayed (nodes explored, time, transposition hits)
+- [x] **RSLT-01**: Clear win/lose result with "必胜" (guaranteed win) badge
+- [x] **RSLT-02**: Search statistics displayed (nodes explored, time, transposition hits)
 - [ ] **RSLT-03**: Tab-based view switching between tree and simulation modes
 - [x] **RSLT-04**: Chinese language UI (primary), English acceptable for technical terms
 
@@ -94,7 +94,7 @@
 | SOLV-07 | Phase 1 | Complete |
 | SOLV-08 | Phase 1 | Complete |
 | WORK-01 | Phase 2 | Complete |
-| WORK-02 | Phase 2 | Pending |
+| WORK-02 | Phase 2 | Complete |
 | WORK-03 | Phase 2 | Complete |
 | TREE-01 | Phase 3 | Pending |
 | TREE-02 | Phase 3 | Pending |
@@ -104,8 +104,8 @@
 | SIM-02 | Phase 3 | Pending |
 | SIM-03 | Phase 3 | Pending |
 | SIM-04 | Phase 3 | Pending |
-| RSLT-01 | Phase 2 | Pending |
-| RSLT-02 | Phase 2 | Pending |
+| RSLT-01 | Phase 2 | Complete |
+| RSLT-02 | Phase 2 | Complete |
 | RSLT-03 | Phase 3 | Pending |
 | RSLT-04 | Phase 2 | Complete |
 
