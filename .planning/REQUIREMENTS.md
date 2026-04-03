@@ -40,9 +40,9 @@
 ### Step-by-Step Simulation
 
 - [x] **SIM-01**: Step-by-step mode walks through optimal play sequence move by move
-- [ ] **SIM-02**: Each step shows: current player, cards played, remaining hands
-- [ ] **SIM-03**: Opponent's possible responses displayed with winning counter-moves highlighted
-- [ ] **SIM-04**: Navigation controls: next/prev step, auto-play, jump to specific step
+- [x] **SIM-02**: Each step shows: current player, cards played, remaining hands
+- [x] **SIM-03**: Opponent's possible responses displayed with winning counter-moves highlighted
+- [x] **SIM-04**: Navigation controls: next/prev step, auto-play, jump to specific step
 
 ### Result Display
 
@@ -101,9 +101,9 @@
 | TREE-03 | Phase 3 | Complete |
 | TREE-04 | Phase 3 | Pending |
 | SIM-01 | Phase 3 | Complete |
-| SIM-02 | Phase 3 | Pending |
-| SIM-03 | Phase 3 | Pending |
-| SIM-04 | Phase 3 | Pending |
+| SIM-02 | Phase 3 | Complete |
+| SIM-03 | Phase 3 | Complete |
+| SIM-04 | Phase 3 | Complete |
 | RSLT-01 | Phase 2 | Complete |
 | RSLT-02 | Phase 2 | Complete |
 | RSLT-03 | Phase 3 | Complete |
