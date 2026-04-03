@@ -26,9 +26,9 @@
 
 ### Worker Integration
 
-- [ ] **WORK-01**: Solver runs in Web Worker via Comlink (non-blocking UI)
+- [x] **WORK-01**: Solver runs in Web Worker via Comlink (non-blocking UI)
 - [ ] **WORK-02**: Progress indicator shows solver status during computation
-- [ ] **WORK-03**: User can cancel in-progress solve
+- [x] **WORK-03**: User can cancel in-progress solve
 
 ### Decision Tree Visualization
 
@@ -49,7 +49,7 @@
 - [ ] **RSLT-01**: Clear win/lose result with "必胜" (guaranteed win) badge
 - [ ] **RSLT-02**: Search statistics displayed (nodes explored, time, transposition hits)
 - [ ] **RSLT-03**: Tab-based view switching between tree and simulation modes
-- [ ] **RSLT-04**: Chinese language UI (primary), English acceptable for technical terms
+- [x] **RSLT-04**: Chinese language UI (primary), English acceptable for technical terms
 
 ## v2 Requirements
 
@@ -93,9 +93,9 @@
 | SOLV-06 | Phase 1 | Complete |
 | SOLV-07 | Phase 1 | Complete |
 | SOLV-08 | Phase 1 | Complete |
-| WORK-01 | Phase 2 | Pending |
+| WORK-01 | Phase 2 | Complete |
 | WORK-02 | Phase 2 | Pending |
-| WORK-03 | Phase 2 | Pending |
+| WORK-03 | Phase 2 | Complete |
 | TREE-01 | Phase 3 | Pending |
 | TREE-02 | Phase 3 | Pending |
 | TREE-03 | Phase 3 | Pending |
@@ -107,7 +107,7 @@
 | RSLT-01 | Phase 2 | Pending |
 | RSLT-02 | Phase 2 | Pending |
 | RSLT-03 | Phase 3 | Pending |
-| RSLT-04 | Phase 2 | Pending |
+| RSLT-04 | Phase 2 | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total

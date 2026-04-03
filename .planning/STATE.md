@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-04-02T20:24:05.476Z"
-last_activity: 2026-04-02
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-04-03T10:47:11.613Z"
+last_activity: 2026-04-03
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** 给定任意两人残局局面，快速算出先手方必胜的完整决策路径——无论对手怎么出牌，都能赢。
-**Current focus:** Phase 01 — core-solver-engine
+**Current focus:** Phase 02 — Interactive App + Worker
 
 ## Current Position
 
-Phase: 2
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-02
+Phase: 02 (Interactive App + Worker) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-04-03
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P01 | 13m | 2 tasks | 10 files |
 | Phase 01 P02 | 10min | 2 tasks | 2 files |
 | Phase 01 P03 | 13m | 2 tasks | 6 files |
+| Phase 02 P01 | 6min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Time budget check every 10000 nodes to reduce performance overhead
 - [Phase 01]: TreeBuilder stack-based push/pop for tree construction during recursion
 - [Phase 01]: solve() swaps perspective for firstPlayerIsUser=false via negated negamax result
+- [Phase 02]: Worker terminates for cancellation (not AbortSignal) -- simplest, most reliable, solver is stateless
+- [Phase 02]: removeCard removes last occurrence of a value -- matches click-to-remove UX
+- [Phase 02]: Single Zustand store for card input and solver state -- coordinated access across components
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-02T20:14:34.478Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-04-03T10:47:11.611Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
