@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import comlink from 'vite-plugin-comlink';
 
 export default defineConfig({
+  base: '/ddz-solver/',
   plugins: [
     comlink(),
     react(),
