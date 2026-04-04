@@ -1,124 +1,49 @@
-import type { TreeNode, Move } from '../solver/types';
+import type { TreeNode, Move, ChildNode } from '../solver/types';
 
 export interface SimulationStep {
-  node: TreeNode;
   move: Move;
   isPlayerMove: boolean;
   result: 'win' | 'loss' | 'unknown';
   /** Child indices path from root to this step's node */
   pathIndices: number[];
   /** All sibling nodes at this level (opponent's possible responses) */
-  siblings: TreeNode[];
-  /** Index of this node among siblings (-1 for root's children) */
+  siblings: ChildNode[];
+  /** Index of this node among siblings */
   siblingIndex: number;
 }
 
 /**
- * Extract a walkable simulation path through the decision tree.
- * For player moves: pick the child with result === 'win'.
- * For opponent moves: default to first child, but include all siblings.
- * Returns steps starting from root's immediate children (skipping the synthetic root).
+ * Build a simulation step from expandNode results.
+ * Used to build steps incrementally instead of walking the full tree.
  */
-export function extractSimulationSteps(tree: TreeNode): SimulationStep[] {
-  const steps: SimulationStep[] = [];
-
-  function walk(node: TreeNode, pathIndices: number[]): void {
-    if (node.children.length === 0) return;
-
-    if (node.children[0]?.isPlayerMove) {
-      // Player's turn: pick the winning child
-      const winIdx = node.children.findIndex(c => c.result === 'win');
-      const pickIdx = winIdx >= 0 ? winIdx : 0;
-      const child = node.children[pickIdx];
-
-      steps.push({
-        node: child,
-        move: child.move,
-        isPlayerMove: child.isPlayerMove,
-        result: child.result,
-        pathIndices: [...pathIndices, pickIdx],
-        siblings: node.children,
-        siblingIndex: pickIdx,
-      });
-
-      walk(child, [...pathIndices, pickIdx]);
-    } else {
-      // Opponent's turn: show all children, default to first
-      const children = node.children;
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        steps.push({
-          node: child,
-          move: child.move,
-          isPlayerMove: child.isPlayerMove,
-          result: child.result,
-          pathIndices: [...pathIndices, i],
-          siblings: children,
-          siblingIndex: i,
-        });
-      }
-      // Continue through the first opponent response (default path)
-      walk(children[0], [...pathIndices, 0]);
-    }
-  }
-
-  walk(tree, []);
-  return steps;
+export function buildStep(
+  children: ChildNode[],
+  pickIndex: number,
+  parentPath: number[],
+): SimulationStep {
+  const child = children[pickIndex];
+  return {
+    move: child.move,
+    isPlayerMove: child.isPlayerMove,
+    result: child.result,
+    pathIndices: [...parentPath, pickIndex],
+    siblings: children,
+    siblingIndex: pickIndex,
+  };
 }
 
 /**
- * Re-extract simulation path when the user picks a specific opponent response.
- * Given a step index and a sibling index, re-route from that point.
+ * Pick the winning move index from a list of children for the player.
+ * Returns 0 as default if no winning child found.
  */
-export function rerouteSimulationPath(
-  tree: TreeNode,
-  originalSteps: SimulationStep[],
-  atStepIndex: number,
-  newSiblingIndex: number,
-): SimulationStep[] {
-  // Keep steps before the reroute point
-  const kept = originalSteps.slice(0, atStepIndex);
-  const rerouteStep = originalSteps[atStepIndex];
+export function pickWinningIndex(children: ChildNode[]): number {
+  const winIdx = children.findIndex(c => c.result === 'win');
+  return winIdx >= 0 ? winIdx : 0;
+}
 
-  // Build new path from the selected sibling
-  const newPathIndices = rerouteStep.pathIndices.slice(0, -1);
-  newPathIndices.push(newSiblingIndex);
-
-  const newSteps: SimulationStep[] = [];
-  // We need to re-extract from the tree starting at the sibling's parent
-  // using the rerouted path
-  let parent: TreeNode = tree;
-  for (const idx of newPathIndices.slice(0, -1)) {
-    parent = parent.children[idx];
-  }
-  const selectedChild = parent.children[newSiblingIndex];
-
-  // Recursively build remaining steps
-  function walk(node: TreeNode, pathIndices: number[]): void {
-    if (node.children.length === 0) return;
-    if (node.children[0]?.isPlayerMove) {
-      const winIdx = node.children.findIndex(c => c.result === 'win');
-      const pickIdx = winIdx >= 0 ? winIdx : 0;
-      const child = node.children[pickIdx];
-      newSteps.push({
-        node: child, move: child.move, isPlayerMove: child.isPlayerMove,
-        result: child.result, pathIndices: [...pathIndices, pickIdx],
-        siblings: node.children, siblingIndex: pickIdx,
-      });
-      walk(child, [...pathIndices, pickIdx]);
-    } else {
-      for (let i = 0; i < node.children.length; i++) {
-        const child = node.children[i];
-        newSteps.push({
-          node: child, move: child.move, isPlayerMove: child.isPlayerMove,
-          result: child.result, pathIndices: [...pathIndices, i],
-          siblings: node.children, siblingIndex: i,
-        });
-      }
-      walk(node.children[0], [...pathIndices, 0]);
-    }
-  }
-
-  walk(selectedChild, newPathIndices);
-  return [...kept, ...newSteps];
+/**
+ * Collect moves along a path for the worker's expandNode call.
+ */
+export function collectMovesFromSteps(steps: SimulationStep[]): Move[] {
+  return steps.map(s => s.move);
 }

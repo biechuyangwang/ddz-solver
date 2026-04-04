@@ -1,19 +1,18 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ReactFlow, Controls, Background, type NodeMouseHandler, type Node } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { useGameStore } from '../../store/game-store';
 import { nodeTypes } from './TreeNodeComponent';
 import { treeToFlow, toggleNodeExpand } from './tree-layout';
 import type { TreeNodeData } from './tree-layout';
-import type { TreeNode } from '../../solver/types';
 import { NodeDetailPanel } from './NodeDetailPanel';
 
 export function DecisionTreeView() {
-  const result = useGameStore((s) => s.result);
+  const tree = useGameStore((s) => s.tree);
   const selectedNodeId = useGameStore((s) => s.selectedNodeId);
   const selectNode = useGameStore((s) => s.selectNode);
-
-  const tree = result?.tree;
+  const expandTreeNode = useGameStore((s) => s.expandTreeNode);
+  const expandingNodeId = useGameStore((s) => s.expandingNodeId);
 
   // Initialize flow from tree
   const [flowData, setFlowData] = useState(() => {
@@ -21,8 +20,8 @@ export function DecisionTreeView() {
     return treeToFlow(tree);
   });
 
-  // Re-compute when tree changes (new solve)
-  useMemo(() => {
+  // Re-compute when tree changes (new solve or expansion)
+  useEffect(() => {
     if (tree) {
       setFlowData(treeToFlow(tree));
     }
@@ -33,14 +32,20 @@ export function DecisionTreeView() {
 
     const nodeData = node.data as TreeNodeData;
 
+    // Select node (show detail panel)
+    selectNode(node.id);
+
+    // If not loaded yet, trigger expansion
+    if (!nodeData.loaded) {
+      expandTreeNode(node.id);
+      return;
+    }
+
     // Toggle expand/collapse if node has children
     if (nodeData.hasChildren) {
       setFlowData((prev) => toggleNodeExpand(node.id, tree, prev.nodes, prev.edges));
     }
-
-    // Select node (show detail panel)
-    selectNode(node.id);
-  }, [tree, selectNode]);
+  }, [tree, selectNode, expandTreeNode]);
 
   const handlePaneClick = useCallback(() => {
     selectNode(null);
@@ -79,6 +84,11 @@ export function DecisionTreeView() {
           nodeId={selectedNodeId}
           tree={tree}
         />
+      )}
+      {expandingNodeId && (
+        <div className="absolute top-2 right-2 bg-white px-3 py-1.5 rounded-lg shadow text-sm text-gray-500">
+          正在展开节点...
+        </div>
       )}
     </div>
   );

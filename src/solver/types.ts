@@ -16,13 +16,13 @@ export enum HandType {
   PASS = 'PASS',
 }
 
-export type Hand = number[]; // length 15, index 0=A(1), index 14=Big Joker(15)
+export type Hand = number[]; // length 15, DDZ rank indices (0=3, 11=A, 12=2, 13=小王, 14=大王)
 
 export interface Move {
   type: HandType;
-  mainRank: number; // index in the count array (0-14)
-  length: number; // number of cards for sequences, or card count
-  cards: number[]; // actual card values played (1-15)
+  mainRank: number;
+  length: number;
+  cards: number[]; // actual card values (1-15)
 }
 
 export const PASS_MOVE: Move = {
@@ -43,16 +43,31 @@ export interface SearchStats {
   transpositionHits: number;
 }
 
+/** A child node returned by expandNode — lightweight, no subtree */
+export interface ChildNode {
+  move: Move;
+  result: 'win' | 'loss' | 'unknown';
+  isPlayerMove: boolean;
+}
+
+/** Client-side tree node — children loaded lazily via expandNode */
 export interface TreeNode {
   move: Move;
   result: 'win' | 'loss' | 'unknown';
   isPlayerMove: boolean;
   children: TreeNode[];
+  /** Whether children have been fetched from the worker */
+  loaded: boolean;
 }
 
 export interface SolverResult {
   winnable: boolean;
   bestMove: Move | null;
   tree: TreeNode | null;
+  stats: SearchStats;
+}
+
+export interface ExpandResult {
+  children: ChildNode[];
   stats: SearchStats;
 }

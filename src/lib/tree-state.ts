@@ -52,6 +52,7 @@ export function reconstructState(
  */
 export function parseNodePath(path: string): number[] {
   if (!path || path === 'root') return [];
+  // Path format: "0", "0.2", "0.2.1" (dot-separated child indices)
   return path.split('.').map(Number);
 }
 

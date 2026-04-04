@@ -42,14 +42,15 @@ export function cardAriaLabel(value: number, suit?: Suit): string {
 
 import { HandType } from '../solver/types';
 import type { Move } from '../solver/types';
+import { indexToCard } from '../solver/encoding';
 
 /** Format a move into a human-readable Chinese label */
 export function formatMoveLabel(move: Move): string {
   if (move.type === HandType.PASS) return '过';
   if (move.type === HandType.ROCKET) return '火箭';
-  if (move.type === HandType.BOMB) return `炸弹 ${VALUE_DISPLAY[move.mainRank + 1] ?? move.mainRank + 1}`;
+  if (move.type === HandType.BOMB) return `炸弹 ${VALUE_DISPLAY[indexToCard(move.mainRank)] ?? indexToCard(move.mainRank)}`;
 
-  const rank = (r: number) => VALUE_DISPLAY[r + 1] ?? String(r + 1);
+  const rank = (r: number) => VALUE_DISPLAY[indexToCard(r)] ?? String(indexToCard(r));
   const cards = move.cards.map(v => VALUE_DISPLAY[v] ?? String(v));
 
   switch (move.type) {

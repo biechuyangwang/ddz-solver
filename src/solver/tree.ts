@@ -19,6 +19,7 @@ export class TreeBuilder {
       result: 'unknown',
       isPlayerMove: false,
       children: [],
+      loaded: true,
     };
     this._root = root;
     this.stack = [root];
@@ -36,6 +37,7 @@ export class TreeBuilder {
       result: 'unknown',
       isPlayerMove,
       children: [],
+      loaded: true,
     };
     parent.children.push(child);
     this.stack.push(child);
@@ -44,13 +46,21 @@ export class TreeBuilder {
 
   /**
    * Pop the current node from the stack.
-   * Sets the node's result based on the negamax value:
-   *   >0 = 'win', <0 = 'loss', 0 = 'unknown'
+   * Sets the node's result from the PLAYER's perspective (not the mover's).
+   *
+   * Negamax values are from the mover's perspective:
+   *   val > 0 = mover wins, val < 0 = mover loses
+   *
+   * We convert to the player's perspective:
+   *   - Player nodes: val > 0 → 'win' (player wins)
+   *   - Opponent nodes: val > 0 → 'loss' (opponent wins = player loses)
    */
   popChild(result: number): void {
     const node = this.stack.pop();
     if (node) {
-      node.result = result > 0 ? 'win' : result < 0 ? 'loss' : 'unknown';
+      // result is from the mover's perspective; invert for opponent nodes
+      const playerResult = node.isPlayerMove ? result : -result;
+      node.result = playerResult > 0 ? 'win' : playerResult < 0 ? 'loss' : 'unknown';
     }
   }
 

@@ -28,7 +28,10 @@ function TreeNodeComponent({ data, id }: NodeProps<TreeNodeNodeType>) {
         <span className="text-sm font-medium text-gray-800 truncate">
           {isRoot ? '初始局面' : data.label}
         </span>
-        {data.hasChildren && (
+        {!data.loaded && (
+          <span className="text-xs text-blue-400 shrink-0">[+]</span>
+        )}
+        {data.loaded && data.hasChildren && (
           <span className="text-xs text-gray-400 shrink-0">
             {data.expanded ? '[-]' : '[+]'}
           </span>

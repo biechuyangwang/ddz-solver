@@ -6,6 +6,117 @@ import { TranspositionTable } from './transposition.js';
 import { TreeBuilder } from './tree.js';
 
 /**
+ * Value-only negamax with transposition table. No tree building.
+ * Used for on-demand expansion: compute child values without materializing subtrees.
+ *
+ * Returns a value from the perspective of the current player:
+ *   1 = current player wins
+ *  -1 = current player loses
+ */
+export function negamaxValue(
+  myHand: Hand,
+  opponentHand: Hand,
+  lastMove: Move | null,
+  passCount: number,
+  nodeCounter: { count: number },
+  tt: TranspositionTable,
+): number {
+  if (handIsEmpty(myHand)) return 1;
+  if (handIsEmpty(opponentHand)) return -1;
+
+  nodeCounter.count++;
+
+  const hash = tt.computeStateHash(myHand, opponentHand, lastMove, passCount);
+  const cached = tt.get(hash);
+  if (cached !== undefined) return cached;
+
+  const moves: Move[] =
+    lastMove === null || passCount >= 1
+      ? generateLeadingMoves(myHand)
+      : generateFollowingMoves(myHand, lastMove);
+
+  let best = -Infinity;
+
+  for (const move of moves) {
+    const newMyHand = applyMove(myHand, move);
+    let newLastMove: Move | null;
+    let newPassCount: number;
+
+    if (move.type === HandType.PASS) {
+      newLastMove = lastMove;
+      newPassCount = passCount + 1;
+    } else {
+      newLastMove = move;
+      newPassCount = 0;
+    }
+
+    const val = -negamaxValue(opponentHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt);
+    best = Math.max(best, val);
+  }
+
+  tt.set(hash, best);
+  return best;
+}
+
+/**
+ * Exhaustive negamax search — explores ALL moves at every level (no alpha-beta pruning).
+ * Uses transposition table for state deduplication to avoid redundant computation.
+ * Builds a complete decision tree showing every possible move.
+ *
+ * Returns a value from the perspective of the current player:
+ *   1 = current player wins
+ *  -1 = current player loses
+ */
+export function negamaxExhaustive(
+  myHand: Hand,
+  opponentHand: Hand,
+  lastMove: Move | null,
+  passCount: number,
+  tree: TreeBuilder,
+  isPlayerMove: boolean,
+  nodeCounter: { count: number },
+  tt: TranspositionTable,
+): number {
+  if (handIsEmpty(myHand)) return 1;
+  if (handIsEmpty(opponentHand)) return -1;
+
+  nodeCounter.count++;
+
+  const hash = tt.computeStateHash(myHand, opponentHand, lastMove, passCount);
+  const cached = tt.get(hash);
+  if (cached !== undefined) return cached;
+
+  const moves: Move[] =
+    lastMove === null || passCount >= 1
+      ? generateLeadingMoves(myHand)
+      : generateFollowingMoves(myHand, lastMove);
+
+  let best = -Infinity;
+
+  for (const move of moves) {
+    const newMyHand = applyMove(myHand, move);
+    let newLastMove: Move | null;
+    let newPassCount: number;
+
+    if (move.type === HandType.PASS) {
+      newLastMove = lastMove;
+      newPassCount = passCount + 1;
+    } else {
+      newLastMove = move;
+      newPassCount = 0;
+    }
+
+    tree.pushChild(move, isPlayerMove);
+    const val = -negamaxExhaustive(opponentHand, newMyHand, newLastMove, newPassCount, tree, !isPlayerMove, nodeCounter, tt);
+    tree.popChild(val);
+    best = Math.max(best, val);
+  }
+
+  tt.set(hash, best);
+  return best;
+}
+
+/**
  * Negamax search with alpha-beta pruning.
  *
  * Returns a value from the perspective of the current player:
@@ -64,7 +175,7 @@ export function negamax(
   // Generate moves based on mode
   // Free lead when: no last move, or two consecutive passes
   const moves: Move[] =
-    lastMove === null || passCount >= 2
+    lastMove === null || passCount >= 1
       ? generateLeadingMoves(myHand)
       : generateFollowingMoves(myHand, lastMove);
 

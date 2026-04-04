@@ -7,6 +7,7 @@ import { DecisionTreeView } from './tree/DecisionTreeView';
 export function ResultPanel() {
   const status = useGameStore((s) => s.status);
   const result = useGameStore((s) => s.result);
+  const tree = useGameStore((s) => s.tree);
   const errorMessage = useGameStore((s) => s.errorMessage);
   const activeTab = useGameStore((s) => s.activeTab);
   const setActiveTab = useGameStore((s) => s.setActiveTab);
@@ -25,7 +26,7 @@ export function ResultPanel() {
 
   if (!result) return null;
 
-  const tabsDisabled = !result.winnable || !result.tree;
+  const tabsDisabled = !result.winnable || !tree;
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">

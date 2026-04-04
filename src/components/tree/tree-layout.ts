@@ -12,6 +12,7 @@ export interface TreeNodeData {
   pathIndex: string; // dot-separated child indices: "0", "0.1", "0.1.2"
   hasChildren: boolean;
   expanded: boolean;
+  loaded: boolean;
   depth: number;
 }
 
@@ -34,7 +35,7 @@ function flattenTree(
 ): void {
   const nodeId = path || 'root';
   const expanded = depth < maxExpandDepth;
-  const hasChildren = node.children.length > 0;
+  const hasChildren = node.loaded ? node.children.length > 0 : true; // unloaded nodes might have children
 
   nodes.push({
     id: nodeId,
@@ -48,6 +49,7 @@ function flattenTree(
       pathIndex: nodeId,
       hasChildren,
       expanded: expanded && hasChildren,
+      loaded: node.loaded,
       depth,
     },
   });
@@ -62,7 +64,7 @@ function flattenTree(
     });
   }
 
-  if (expanded && hasChildren) {
+  if (expanded && hasChildren && node.loaded) {
     node.children.forEach((child, i) => {
       flattenTree(child, nodeId, path ? `${path}.${i}` : `${i}`, depth + 1, maxExpandDepth, nodes, edges);
     });
@@ -75,7 +77,7 @@ function flattenTree(
 export function treeToFlow(tree: TreeNode): { nodes: Node<TreeNodeData>[]; edges: Edge[] } {
   const nodes: Node<TreeNodeData>[] = [];
   const edges: Edge[] = [];
-  flattenTree(tree, null, 'root', 0, 2, nodes, edges);
+  flattenTree(tree, null, '', 0, 2, nodes, edges);
 
   const g = new dagre.graphlib.Graph();
   g.setDefaultEdgeLabel(() => ({}));
@@ -128,10 +130,15 @@ export function toggleNodeExpand(
   }
 
   // Expand: find the TreeNode at this path and add its children
-  const pathParts = nodeId === 'root' ? [] : nodeId.split('.').slice(1);
+  const pathParts = nodeId === 'root' ? [] : nodeId.split('.').slice(1).map(Number);
+  // Fix: pathParts for root children should be the full indices
+  // nodeId "0" → pathParts should be [0] (split(".") on "0" → ["0"])
+  // nodeId "0.2" → pathParts should be [0, 2]
+  // But split('.') on "root" is handled above. Let's fix the parsing:
+  const indexPath = nodeId === 'root' ? [] : nodeId.split('.').map(Number);
   let treeNode: TreeNode = sourceTree;
-  for (const part of pathParts) {
-    treeNode = treeNode.children[Number(part)];
+  for (const part of indexPath) {
+    treeNode = treeNode.children[part];
     if (!treeNode) return { nodes: currentNodes, edges: currentEdges };
   }
 
@@ -141,7 +148,11 @@ export function toggleNodeExpand(
   // Update the clicked node
   newNodes[nodeIndex] = { ...node, data: { ...data, expanded: true } };
 
-  // Add children
+  // Add children (only if loaded)
+  if (!treeNode.loaded) {
+    return { nodes: currentNodes, edges: currentEdges };
+  }
+
   treeNode.children.forEach((child, i) => {
     const childId = nodeId === 'root' ? `${i}` : `${nodeId}.${i}`;
     const childNode: Node<TreeNodeData> = {
@@ -154,8 +165,9 @@ export function toggleNodeExpand(
         result: child.result,
         isPlayerMove: child.isPlayerMove,
         pathIndex: childId,
-        hasChildren: child.children.length > 0,
+        hasChildren: child.loaded ? child.children.length > 0 : true,
         expanded: false,
+        loaded: child.loaded,
         depth: data.depth + 1,
       },
     };

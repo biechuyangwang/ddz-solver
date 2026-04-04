@@ -2,7 +2,7 @@ import type { TreeNode } from '../../solver/types';
 import { reconstructState, parseNodePath } from '../../lib/tree-state';
 import { useGameStore } from '../../store/game-store';
 import { VALUE_DISPLAY, formatMoveLabel } from '../../lib/card-utils';
-import { handSize } from '../../solver/encoding';
+import { handSize, indexToCard } from '../../solver/encoding';
 import { cn } from '../../lib/cn';
 import { X } from 'lucide-react';
 
@@ -17,24 +17,43 @@ export function NodeDetailPanel({ nodeId, tree }: NodeDetailPanelProps) {
   const selectNode = useGameStore((s) => s.selectNode);
 
   const isRoot = nodeId === 'root';
-  const childIndices = parseNodePath(nodeId === 'root' ? '' : nodeId.replace('root.', ''));
-  const state = reconstructState(playerCards, opponentCards, tree, childIndices);
+  const childIndices = parseNodePath(nodeId);
+  const handleClose = () => selectNode(null);
 
   // Get the node itself for move/result info
-  let node: TreeNode = tree;
+  let node: TreeNode | null = tree;
   for (const idx of childIndices) {
-    node = node.children[idx];
     if (!node) break;
+    node = node.children[idx] ?? null;
   }
 
-  const handleClose = () => selectNode(null);
+  // Guard: if node not found (lazy tree hasn't loaded it yet), show minimal info
+  if (!node) {
+    return (
+      <div className="w-[280px] border-l border-gray-200 bg-white p-4 overflow-y-auto shrink-0">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-gray-800">节点详情</h3>
+          <button
+            onClick={handleClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="关闭"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <p className="text-sm text-gray-400">点击节点以加载详情</p>
+      </div>
+    );
+  }
+
+  const state = reconstructState(playerCards, opponentCards, tree, childIndices);
 
   // Convert hand (count array) to displayable card list
   const handToCards = (hand: number[]): string[] => {
     const cards: string[] = [];
     for (let i = 0; i < hand.length; i++) {
       for (let j = 0; j < hand[i]; j++) {
-        cards.push(VALUE_DISPLAY[i + 1] ?? String(i + 1));
+        cards.push(VALUE_DISPLAY[indexToCard(i)] ?? String(indexToCard(i)));
       }
     }
     return cards;
@@ -74,7 +93,7 @@ export function NodeDetailPanel({ nodeId, tree }: NodeDetailPanelProps) {
       {/* Result */}
       {!isRoot && (
         <div className="mb-4">
-          <span className="text-xs font-semibold text-gray-500">结果</span>
+          <span className="text-xs font-semibold text-gray-500">我方结果</span>
           <p className={cn(
             'text-sm font-medium mt-1',
             node.result === 'win' ? 'text-green-600' : node.result === 'loss' ? 'text-red-600' : 'text-gray-500',

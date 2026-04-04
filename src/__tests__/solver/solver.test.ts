@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { HandType } from '../../solver/types.js';
-import { solve } from '../../solver/solver.js';
+import { solve, expandNode } from '../../solver/solver.js';
 
 describe('solve -- end-to-end integration tests', () => {
   it('1 card vs 1 card -- player wins when higher and going first', () => {
@@ -140,13 +140,14 @@ describe('solve -- end-to-end integration tests', () => {
     const result = solve([5], [3], { firstPlayerIsUser: true });
 
     expect(result.winnable).toBe(true);
-    expect(result.tree).not.toBeNull();
+    expect(result.tree).toBeNull(); // on-demand: no tree returned
 
-    // Root node should exist with children
-    expect(result.tree!.children.length).toBeGreaterThan(0);
+    // Use expandNode to get root-level children
+    const expanded = expandNode([5], [3], [], { firstPlayerIsUser: true });
+    expect(expanded.children.length).toBeGreaterThan(0);
 
     // Should contain the winning first move (SINGLE 5)
-    const winningChild = result.tree!.children.find(
+    const winningChild = expanded.children.find(
       c => c.result === 'win' && c.move.type === HandType.SINGLE && c.move.cards[0] === 5,
     );
     expect(winningChild).toBeDefined();

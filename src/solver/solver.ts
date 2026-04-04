@@ -1,89 +1,141 @@
-import type { SolverOptions, SolverResult, Move, TreeNode } from './types.js';
-import { DEFAULT_TIME_BUDGET } from './constants.js';
-import { createHand } from './encoding.js';
+import type { SolverOptions, SolverResult, Move, ChildNode, ExpandResult, SearchStats } from './types.js';
+import { HandType } from './types.js';
+import { createHand, applyMove, handIsEmpty } from './encoding.js';
 import { TranspositionTable } from './transposition.js';
-import { TreeBuilder } from './tree.js';
-import { negamax } from './search.js';
+import { generateLeadingMoves, generateFollowingMoves } from './move-gen.js';
+import { negamaxValue } from './search.js';
 
 /**
- * Top-level solver API.
- *
- * Per D-02: input is two number arrays (card values) plus optional SolverOptions.
- * Per D-03: output is SolverResult with winnable, bestMove, tree, stats.
- * Per D-04: unwinnable returns { winnable: false, bestMove: null, tree: null }.
- * Per D-05: no best-effort strategy for losing positions.
- * Per SOLV-07: default time budget = 10000ms.
+ * Solve — determines if the first player can win.
+ * Returns only the result and best move (no tree — avoids serialization issues).
  */
 export function solve(
-  playerHand: number[],
-  opponentHand: number[],
+  playerCards: number[],
+  opponentCards: number[],
   options?: SolverOptions,
 ): SolverResult {
-  const timeBudget = options?.timeBudget ?? DEFAULT_TIME_BUDGET;
+  const firstPlayerIsUser = options?.firstPlayerIsUser ?? true;
+  const userEncoded = createHand(playerCards);
+  const oppEncoded = createHand(opponentCards);
+
+  const tt = new TranspositionTable();
+  const nodeCounter = { count: 0 };
+  const startTime = performance.now();
+
+  // Compute root value from first player's perspective
+  let rootValue: number;
+  if (firstPlayerIsUser) {
+    rootValue = negamaxValue(userEncoded, oppEncoded, null, 0, nodeCounter, tt);
+  } else {
+    const oppValue = negamaxValue(oppEncoded, userEncoded, null, 0, nodeCounter, tt);
+    rootValue = -oppValue;
+  }
+
+  const endTime = performance.now();
+  const winnable = rootValue > 0;
+
+  // Find best move by expanding root level
+  let bestMove: Move | null = null;
+  if (winnable) {
+    const expanded = expandNode(playerCards, opponentCards, [], options);
+    const winner = expanded.children.find(c => c.result === 'win');
+    bestMove = winner?.move ?? null;
+  }
+
+  return {
+    winnable,
+    bestMove,
+    tree: null,
+    stats: {
+      nodesExplored: nodeCounter.count,
+      timeMs: endTime - startTime,
+      transpositionHits: tt.hits,
+    },
+  };
+}
+
+/**
+ * Expand one level of the game tree at the given path.
+ * Replays pathMoves from the initial state, then computes all children
+ * with their results using TT-enabled negamax.
+ *
+ * This is the core of the on-demand architecture — each call returns only
+ * one level of children, keeping the response small and serializable.
+ */
+export function expandNode(
+  playerCards: number[],
+  opponentCards: number[],
+  pathMoves: Move[],
+  options?: SolverOptions,
+): ExpandResult {
   const firstPlayerIsUser = options?.firstPlayerIsUser ?? true;
 
-  // Encode hands into count-based representation
-  const userEncoded = createHand(playerHand);
-  const oppEncoded = createHand(opponentHand);
+  // 1. Replay moves to reconstruct current game state
+  let playerHand = createHand(playerCards);
+  let opponentHand = createHand(opponentCards);
+  let lastMove: Move | null = null;
+  let passCount = 0;
+  let isPlayerTurn = firstPlayerIsUser;
 
-  // Create search infrastructure
+  for (const move of pathMoves) {
+    if (isPlayerTurn) {
+      playerHand = applyMove(playerHand, move);
+    } else {
+      opponentHand = applyMove(opponentHand, move);
+    }
+    if (move.type === HandType.PASS) {
+      passCount++;
+    } else {
+      lastMove = move;
+      passCount = 0;
+    }
+    isPlayerTurn = !isPlayerTurn;
+  }
+
+  // 2. Check terminal — no children if game is over
+  if (handIsEmpty(playerHand) || handIsEmpty(opponentHand)) {
+    return { children: [], stats: { nodesExplored: 0, timeMs: 0, transpositionHits: 0 } };
+  }
+
+  // 3. Generate moves for the current player
+  const myHand = isPlayerTurn ? playerHand : opponentHand;
+  const theirHand = isPlayerTurn ? opponentHand : playerHand;
+
+  const moves = lastMove === null || passCount >= 1
+    ? generateLeadingMoves(myHand)
+    : generateFollowingMoves(myHand, lastMove);
+
+  // 4. Evaluate each child with TT-enabled negamax
   const tt = new TranspositionTable();
-  const treeBuilder = new TreeBuilder();
   const nodeCounter = { count: 0 };
-
-  // Create tree root
-  treeBuilder.createRoot();
-
-  // Record start time and compute deadline
   const startTime = performance.now();
-  const deadline = startTime + timeBudget;
 
-  let result: number;
+  const children: ChildNode[] = [];
 
-  if (firstPlayerIsUser) {
-    // User leads first. Search from user's perspective.
-    result = negamax(
-      userEncoded, oppEncoded,
-      null, 0,
-      -Infinity, Infinity, deadline,
-      tt, treeBuilder, true, nodeCounter,
-    );
-  } else {
-    // Opponent leads first. Search from opponent's perspective.
-    // If opponent's result > 0, opponent wins -> user loses.
-    // If opponent's result < 0, opponent loses -> user wins.
-    const oppResult = negamax(
-      oppEncoded, userEncoded,
-      null, 0,
-      -Infinity, Infinity, deadline,
-      tt, treeBuilder, false, nodeCounter,
-    );
-    // Negate: if opponent wins (oppResult > 0), user loses (result < 0)
-    result = -oppResult;
+  for (const move of moves) {
+    const newMyHand = applyMove(myHand, move);
+    let newLastMove: Move | null;
+    let newPassCount: number;
+
+    if (move.type === HandType.PASS) {
+      newLastMove = lastMove;
+      newPassCount = passCount + 1;
+    } else {
+      newLastMove = move;
+      newPassCount = 0;
+    }
+
+    // Value from mover's perspective, then convert to player's perspective
+    const val = -negamaxValue(theirHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt);
+    const playerResult = isPlayerTurn ? val : -val;
+    const result = playerResult > 0 ? 'win' : playerResult < 0 ? 'loss' : 'unknown' as const;
+
+    children.push({ move, result, isPlayerMove: isPlayerTurn });
   }
 
-  // Record end time
   const endTime = performance.now();
-
-  // Build stats
-  const stats = {
-    nodesExplored: nodeCounter.count,
-    timeMs: endTime - startTime,
-    transpositionHits: tt.hits,
+  return {
+    children,
+    stats: { nodesExplored: nodeCounter.count, timeMs: endTime - startTime, transpositionHits: tt.hits },
   };
-
-  // Determine winnability
-  const winnable = result > 0;
-
-  if (winnable) {
-    // Find best move: scan root's children for the winning move
-    const bestChild = treeBuilder.root.children.find(c => c.result === 'win') ?? null;
-    const bestMove: Move | null = bestChild?.move ?? null;
-    const tree: TreeNode | null = treeBuilder.root;
-
-    return { winnable: true, bestMove, tree, stats };
-  } else {
-    // Per D-04/D-05: no best-effort for losing positions
-    return { winnable: false, bestMove: null, tree: null, stats };
-  }
 }

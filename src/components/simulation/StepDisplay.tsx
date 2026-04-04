@@ -2,19 +2,19 @@ import type { SimulationStep } from '../../lib/simulation-path';
 import type { GameStateAtNode } from '../../lib/tree-state';
 import { cn } from '../../lib/cn';
 import { VALUE_DISPLAY } from '../../lib/card-utils';
-import { handSize } from '../../solver/encoding';
+import { handSize, indexToCard } from '../../solver/encoding';
 
 interface StepDisplayProps {
   step: SimulationStep;
   gameState: GameStateAtNode;
 }
 
-/** Convert a count-encoded hand to displayable card value array */
+/** Convert a count-encoded hand (DDZ rank indices) to displayable card value array */
 function handToValues(hand: number[]): number[] {
   const values: number[] = [];
   for (let i = 0; i < hand.length; i++) {
     for (let j = 0; j < hand[i]; j++) {
-      values.push(i + 1);
+      values.push(indexToCard(i));
     }
   }
   return values;
