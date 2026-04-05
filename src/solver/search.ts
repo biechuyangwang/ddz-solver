@@ -1,13 +1,19 @@
 import { HandType } from './types.js';
 import type { Hand, Move } from './types.js';
-import { handIsEmpty, applyMove } from './encoding.js';
+import { handIsEmpty, applyMove, handSize } from './encoding.js';
 import { generateLeadingMoves, generateFollowingMoves } from './move-gen.js';
 import { TranspositionTable } from './transposition.js';
 import { TreeBuilder } from './tree.js';
 
 /**
- * Value-only negamax with transposition table. No tree building.
- * Used for on-demand expansion: compute child values without materializing subtrees.
+ * Value-only negamax with alpha-beta pruning and transposition table.
+ * No tree building. Used for on-demand expansion.
+ *
+ * Optimizations:
+ *   [Opt 1] Instant win: detects hand-emptying moves before full search
+ *   [Opt 2] Early win return: stops as soon as val=1 is found
+ *   [Opt 3] Alpha-beta pruning: most effective with null window (0,1)
+ *   [Opt 4] Move ordering: more cards first → higher rank → PASS last
  *
  * Returns a value from the perspective of the current player:
  *   1 = current player wins
@@ -20,6 +26,8 @@ export function negamaxValue(
   passCount: number,
   nodeCounter: { count: number },
   tt: TranspositionTable,
+  alpha: number = -Infinity,
+  beta: number = Infinity,
 ): number {
   if (handIsEmpty(myHand)) return 1;
   if (handIsEmpty(opponentHand)) return -1;
@@ -34,6 +42,24 @@ export function negamaxValue(
     lastMove === null || passCount >= 1
       ? generateLeadingMoves(myHand)
       : generateFollowingMoves(myHand, lastMove);
+
+  // [Opt 1] Instant win: any move that empties the entire hand is an immediate win
+  const mySize = handSize(myHand);
+  for (const move of moves) {
+    if (move.type !== HandType.PASS && move.cards.length === mySize) {
+      tt.set(hash, 1);
+      return 1;
+    }
+  }
+
+  // [Opt 4] Move ordering: more cards first → higher rank → PASS last
+  moves.sort((a, b) => {
+    if (a.type === HandType.PASS) return 1;
+    if (b.type === HandType.PASS) return -1;
+    const cardDiff = b.cards.length - a.cards.length;
+    if (cardDiff !== 0) return cardDiff;
+    return b.mainRank - a.mainRank;
+  });
 
   let best = -Infinity;
 
@@ -50,8 +76,22 @@ export function negamaxValue(
       newPassCount = 0;
     }
 
-    const val = -negamaxValue(opponentHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt);
+    const val = -negamaxValue(opponentHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt, -beta, -alpha);
+
     best = Math.max(best, val);
+
+    // [Opt 2] Early win: found a winning move, stop searching siblings
+    if (val === 1) {
+      tt.set(hash, 1);
+      return 1;
+    }
+
+    alpha = Math.max(alpha, val);
+
+    // [Opt 3] Alpha-beta pruning
+    if (alpha >= beta) {
+      break;
+    }
   }
 
   tt.set(hash, best);
@@ -179,10 +219,8 @@ export function negamax(
       ? generateLeadingMoves(myHand)
       : generateFollowingMoves(myHand, lastMove);
 
-  // Move ordering heuristic: bombs first, then by mainRank descending
-  // This causes early alpha-beta cutoffs
+  // Move ordering heuristic: bombs first, then more cards first, then rank descending
   moves.sort((a, b) => {
-    // PASS moves to the end
     if (a.type === HandType.PASS) return 1;
     if (b.type === HandType.PASS) return -1;
     // Bombs and rockets first
@@ -190,6 +228,9 @@ export function negamax(
     const bIsBomb = b.type === HandType.BOMB || b.type === HandType.ROCKET;
     if (aIsBomb && !bIsBomb) return -1;
     if (!aIsBomb && bIsBomb) return 1;
+    // More cards first (closer to emptying hand)
+    const cardDiff = b.cards.length - a.cards.length;
+    if (cardDiff !== 0) return cardDiff;
     // Then by mainRank descending
     return b.mainRank - a.mainRank;
   });

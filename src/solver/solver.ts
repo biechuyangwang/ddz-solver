@@ -22,12 +22,13 @@ export function solve(
   const nodeCounter = { count: 0 };
   const startTime = performance.now();
 
-  // Compute root value from first player's perspective
+  // Compute root value from first player's perspective using null window (0, 1)
+  // Since game values are binary (1/-1), null window is sufficient for win/loss determination
   let rootValue: number;
   if (firstPlayerIsUser) {
-    rootValue = negamaxValue(userEncoded, oppEncoded, null, 0, nodeCounter, tt);
+    rootValue = negamaxValue(userEncoded, oppEncoded, null, 0, nodeCounter, tt, 0, 1);
   } else {
-    const oppValue = negamaxValue(oppEncoded, userEncoded, null, 0, nodeCounter, tt);
+    const oppValue = negamaxValue(oppEncoded, userEncoded, null, 0, nodeCounter, tt, 0, 1);
     rootValue = -oppValue;
   }
 
@@ -126,7 +127,8 @@ export function expandNode(
     }
 
     // Value from mover's perspective, then convert to player's perspective
-    const val = -negamaxValue(theirHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt);
+    // Null window (0, 1) is sufficient: binary game values mean we only need win/loss
+    const val = -negamaxValue(theirHand, newMyHand, newLastMove, newPassCount, nodeCounter, tt, 0, 1);
     const playerResult = isPlayerTurn ? val : -val;
     const result = playerResult > 0 ? 'win' : playerResult < 0 ? 'loss' : 'unknown' as const;
 
