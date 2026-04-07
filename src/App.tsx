@@ -21,7 +21,7 @@ function App() {
   const canSolve =
     playerCards.length > 0 &&
     opponentCards.length > 0 &&
-    status === 'idle';
+    (status === 'idle' || status === 'done' || status === 'error');
 
   return (
     <div className="min-h-screen bg-page-bg">
