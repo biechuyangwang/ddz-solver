@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '../../store/game-store';
 import { buildStep, pickWinningIndex, collectMovesFromSteps, type SimulationStep } from '../../lib/simulation-path';
-import { reconstructState } from '../../lib/tree-state';
+import { reconstructStateFromSteps } from '../../lib/tree-state';
 import { StepDisplay } from './StepDisplay';
 import { SimulationControls } from './SimulationControls';
 import { OpponentResponses } from './OpponentResponses';
@@ -226,11 +226,11 @@ export function SimulationView() {
   }
 
   // Reconstruct game state at current step
-  const gameState = reconstructState(
+  const gameState = reconstructStateFromSteps(
     playerCards,
     opponentCards,
-    tree,
-    currentStep.pathIndices,
+    steps,
+    currentStepIndex,
   );
 
   return (

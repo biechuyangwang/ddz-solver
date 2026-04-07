@@ -1,4 +1,5 @@
 import type { Hand, Move, TreeNode } from '../solver/types';
+import type { SimulationStep } from './simulation-path';
 import { createHand, applyMove } from '../solver/encoding';
 
 export interface GameStateAtNode {
@@ -41,6 +42,41 @@ export function reconstructState(
       passCount = 0;
     }
     current = child;
+  }
+
+  return { playerHand, opponentHand, lastMove, passCount };
+}
+
+/**
+ * Reconstruct game state by applying moves from simulation steps.
+ * Unlike the tree-based version, this works even when tree nodes
+ * haven't been lazily loaded yet.
+ */
+export function reconstructStateFromSteps(
+  initialPlayerCards: number[],
+  initialOpponentCards: number[],
+  steps: SimulationStep[],
+  upToStepIndex: number,
+): GameStateAtNode {
+  let playerHand = createHand(initialPlayerCards);
+  let opponentHand = createHand(initialOpponentCards);
+  let lastMove: Move | null = null;
+  let passCount = 0;
+
+  for (let i = 0; i <= upToStepIndex; i++) {
+    const step = steps[i];
+    if (step.isPlayerMove) {
+      playerHand = applyMove(playerHand, step.move);
+    } else {
+      opponentHand = applyMove(opponentHand, step.move);
+    }
+
+    if (step.move.type === 'PASS') {
+      passCount++;
+    } else {
+      lastMove = step.move;
+      passCount = 0;
+    }
   }
 
   return { playerHand, opponentHand, lastMove, passCount };
